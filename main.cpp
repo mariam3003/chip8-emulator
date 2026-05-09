@@ -22,7 +22,6 @@ int main(int argc, char* argv[]) {
     if (!chip8.LoadRom(argv[1]))
         return EXIT_FAILURE;
 
-    // ~1200 microseconds per cycle gives roughly 500-600 cycles/sec
     constexpr auto cycleDelay = std::chrono::microseconds(1200);
     bool quit = false;
 
@@ -31,10 +30,8 @@ int main(int argc, char* argv[]) {
 
         chip8.Cycle();
 
-        // Play beep if sound timer is active
         window.UpdateSound(chip8.GetSoundTimer());
 
-        // Only redraw when the display has actually changed
         if (chip8.m_drawFlag) {
             chip8.m_drawFlag = false;
             window.Update(chip8.m_display);

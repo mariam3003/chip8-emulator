@@ -4,13 +4,10 @@
 #include <unordered_map>
 #include <cmath>
 
-// Define M_PI manually for cross-platform safety
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
 
-// --- Audio callback ---
-// Generates a 440Hz sine wave beep into the SDL audio buffer
 void Graphics::AudioCallback(void* userdata, Uint8* stream, int len) {
     auto* self = static_cast<Graphics*>(userdata);
     Sint16* buffer = reinterpret_cast<Sint16*>(stream);
@@ -58,7 +55,6 @@ Graphics::Graphics(const char* title, int windowWidth, int windowHeight, int pix
         std::exit(EXIT_FAILURE);
     }
 
-    // Set up audio for beep output
     SDL_AudioSpec audioSpec{};
     audioSpec.freq     = 44100;
     audioSpec.format   = AUDIO_S16SYS;
@@ -81,11 +77,9 @@ Graphics::~Graphics() {
 }
 
 auto Graphics::Update(const std::array<uint8_t, VIDEO_WIDTH * VIDEO_HEIGHT>& displayBuffer) -> void {
-    // Clear to black
     SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
     SDL_RenderClear(m_renderer);
 
-    // Draw lit pixels in white
     SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
     for (int y = 0; y < VIDEO_HEIGHT; ++y) {
         for (int x = 0; x < VIDEO_WIDTH; ++x) {
@@ -108,20 +102,15 @@ auto Graphics::UpdateSound(uint8_t soundTimer) -> void {
     if (m_audioDevice == 0) return;
 
     if (soundTimer > 0 && !m_beepPlaying) {
-        SDL_PauseAudioDevice(m_audioDevice, 0); // start beep
+        SDL_PauseAudioDevice(m_audioDevice, 0);
         m_beepPlaying = true;
     } else if (soundTimer == 0 && m_beepPlaying) {
-        SDL_PauseAudioDevice(m_audioDevice, 1); // stop beep
+        SDL_PauseAudioDevice(m_audioDevice, 1);
         m_beepPlaying = false;
     }
 }
 
 auto Graphics::ReadInput(std::array<uint8_t, NUMBER_OF_KEYS>& keys) -> bool {
-    // CHIP-8 keypad layout mapped to keyboard keys:
-    // CHIP-8:  1 2 3 C       Keyboard:  1 2 3 4
-    //          4 5 6 D                  Q W E R
-    //          7 8 9 E                  A S D F
-    //          A 0 B F                  Z X C V
     static const std::unordered_map<SDL_Keycode, uint8_t> keyMapping = {
         {SDLK_x, 0x0}, {SDLK_1, 0x1}, {SDLK_2, 0x2}, {SDLK_3, 0x3},
         {SDLK_q, 0x4}, {SDLK_w, 0x5}, {SDLK_e, 0x6}, {SDLK_a, 0x7},
